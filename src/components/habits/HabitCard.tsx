@@ -1,13 +1,13 @@
-import React from 'react'
+import React, { useState } from 'react'
 import type { Habit } from '../../types/habit'
-import { Edit, Trash2, Eye, CheckCircle2, Circle } from 'lucide-react'
+import { Edit, Trash2, Eye, CheckCircle2, Circle, Loader2 } from 'lucide-react'
 import { Button } from '../common/Button'
 
 interface HabitCardProps {
   habit: Habit
   onEdit: (habit: Habit) => void
   onDelete: (id: string) => void
-  onTrack: (habitId: string) => void
+  onTrack: (habitId: string) => Promise<void> | void
   onViewDetails: (habitId: string) => void
 }
 
@@ -18,7 +18,9 @@ export const HabitCard: React.FC<HabitCardProps> = ({
   onTrack,
   onViewDetails,
 }) => {
+  const [isTrackLoading, setIsTrackLoading] = useState(false)
   const trackedToday = habit.trackedToday ?? false
+  
   const emojiByCategory: Record<string, string> = {
     health: '💪',
     fitness: '🏃‍♂️',
@@ -34,6 +36,15 @@ export const HabitCard: React.FC<HabitCardProps> = ({
 
   const backgroundStyle = {
     background: `linear-gradient(135deg, ${habit.color}33, ${habit.color}55)`,
+  }
+
+  const handleTrack = async () => {
+    setIsTrackLoading(true)
+    try {
+      await onTrack(habit.id)
+    } finally {
+      setIsTrackLoading(false)
+    }
   }
 
   return (
@@ -60,14 +71,19 @@ export const HabitCard: React.FC<HabitCardProps> = ({
                 <p className="text-sm text-gray-700 line-clamp-1">{habit.description}</p>
               </div>
               <Button
-                onClick={() => onTrack(habit.id)}
+                onClick={handleTrack}
                 variant={trackedToday ? 'success' : 'secondary'}
                 size="sm"
-                className={`rounded-full px-4 ${
+                disabled={isTrackLoading}
+                className={`rounded-full px-4 relative ${
                   trackedToday ? 'bg-emerald-500 text-white hover:bg-emerald-600' : 'bg-white/80'
                 }`}
               >
-                {trackedToday ? 'Tracked' : 'Track'}
+                {isTrackLoading ? (
+                  <Loader2 size={16} className="animate-spin" />
+                ) : (
+                  trackedToday ? 'Tracked' : 'Track'
+                )}
               </Button>
             </div>
           </div>

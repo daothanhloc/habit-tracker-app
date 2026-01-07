@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { Input } from '../common/Input'
 import { Button } from '../common/Button'
 import { useAuthStore } from '../../store/authStore'
-import { LogIn, Mail, Lock } from 'lucide-react'
+import { Eye, EyeOff } from 'lucide-react'
 
 interface LoginFormProps {
   onSwitchToSignup: () => void
@@ -11,6 +11,7 @@ interface LoginFormProps {
 export const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToSignup }) => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
   const [validationErrors, setValidationErrors] = useState<{
     email?: string
     password?: string
@@ -29,8 +30,8 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToSignup }) => {
 
     if (!password) {
       errors.password = 'Password is required'
-    } else if (password.length < 6) {
-      errors.password = 'Password must be at least 6 characters'
+    } else if (password.length < 8) {
+      errors.password = 'Password must be at least 8 characters'
     }
 
     setValidationErrors(errors)
@@ -51,68 +52,57 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToSignup }) => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-50 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-400 to-indigo-600 px-4">
       <div className="w-full max-w-md animate-scale-in">
-        {/* Card */}
-        <div className="bg-white rounded-2xl shadow-2xl p-8 border border-gray-100">
+        <div className="bg-white rounded-3xl shadow-2xl p-8 lg:p-10">
           {/* Header */}
-          <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl mb-4">
-              <LogIn className="text-white" size={32} />
-            </div>
-            <h2 className="text-3xl font-bold gradient-text mb-2">Welcome Back</h2>
-            <p className="text-gray-600">Sign in to continue tracking your habits</p>
+          <div className="text-center mb-10">
+            <h2 className="text-3xl font-bold text-gray-900 mb-2">Welcome Back</h2>
+            <p className="text-gray-500 font-medium">Sign in to continue tracking your habits</p>
           </div>
 
           {/* Error Message */}
           {error && (
-            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl">
-              <p className="text-red-600 text-sm font-medium">{error}</p>
+            <div className="mb-6 p-4 bg-red-50 border border-red-100 rounded-2xl animate-pulse">
+              <p className="text-red-600 text-sm font-bold text-center">{error}</p>
             </div>
           )}
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-5">
-            <div>
-              <div className="relative">
-                <Mail
-                  className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"
-                  size={20}
-                />
-                <Input
-                  type="email"
-                  placeholder="Enter your email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  error={validationErrors.email}
-                  className="pl-12"
-                  disabled={isLoading}
-                />
-              </div>
-            </div>
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <Input
+              label="Email"
+              type="email"
+              placeholder="example@gmail.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              error={validationErrors.email}
+              disabled={isLoading}
+            />
 
-            <div>
-              <div className="relative">
-                <Lock
-                  className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"
-                  size={20}
-                />
-                <Input
-                  type="password"
-                  placeholder="Enter your password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  error={validationErrors.password}
-                  className="pl-12"
-                  disabled={isLoading}
-                />
-              </div>
+            <Input
+              label="Password"
+              type={showPassword ? "text" : "password"}
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              error={validationErrors.password}
+              disabled={isLoading}
+              rightIcon={showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+              onRightIconClick={() => setShowPassword(!showPassword)}
+            />
+
+            <div className="flex justify-end">
+              <button type="button" className="text-sm font-semibold text-indigo-600 hover:text-indigo-800 hover:underline">
+                Forgot Password?
+              </button>
             </div>
 
             <Button
               type="submit"
               variant="primary"
               className="w-full"
+              size="lg"
               disabled={isLoading}
             >
               {isLoading ? 'Signing in...' : 'Sign In'}
@@ -120,13 +110,13 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToSignup }) => {
           </form>
 
           {/* Switch to Signup */}
-          <div className="mt-6 text-center">
-            <p className="text-gray-600 text-sm">
+          <div className="mt-8 text-center">
+            <p className="text-gray-600 font-medium">
               Don't have an account?{' '}
               <button
                 type="button"
                 onClick={onSwitchToSignup}
-                className="text-indigo-600 font-semibold hover:text-indigo-700 transition-colors"
+                className="text-indigo-600 font-bold hover:text-indigo-700 hover:underline transition-all"
                 disabled={isLoading}
               >
                 Sign up
