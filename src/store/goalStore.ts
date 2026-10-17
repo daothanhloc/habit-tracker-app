@@ -1,104 +1,64 @@
 import { create } from 'zustand'
-import type { HabitGoal, GoalProgress, CreateGoalDto, UpdateGoalDto } from '../types/goal'
+import { toast } from 'sonner'
+import type { Goal, CreateGoalDto, UpdateGoalDto } from '../types/goal'
 import { goalService } from '../services/goalService'
+import { getErrorMessage } from '../lib/errorMessage'
 
 interface GoalState {
-  goals: Record<string, HabitGoal[]>
-  goalProgress: Record<string, GoalProgress>
+  goals: Goal[]
   loading: boolean
-  error: string | null
-  createGoal: (habitId: string, data: CreateGoalDto) => Promise<void>
-  fetchGoals: (habitId: string) => Promise<void>
-  fetchGoalProgress: (habitId: string, goalId: string) => Promise<void>
-  updateGoal: (habitId: string, goalId: string, data: UpdateGoalDto) => Promise<void>
-  deleteGoal: (habitId: string, goalId: string) => Promise<void>
+  fetchGoals: () => Promise<void>
+  createGoal: (data: CreateGoalDto) => Promise<Goal | null>
+  updateGoal: (id: string, data: UpdateGoalDto) => Promise<void>
+  deleteGoal: (id: string) => Promise<void>
 }
 
 export const useGoalStore = create<GoalState>((set) => ({
-  goals: {},
-  goalProgress: {},
+  goals: [],
   loading: false,
-  error: null,
 
-  createGoal: async (habitId, data) => {
-    set({ loading: true, error: null })
+  fetchGoals: async () => {
+    set({ loading: true })
     try {
-      const newGoal = await goalService.create(habitId, data)
-      set((state) => ({
-        goals: {
-          ...state.goals,
-          [habitId]: [...(state.goals[habitId] || []), newGoal],
-        },
-        loading: false,
-      }))
+      const goals = await goalService.list()
+      set({ goals, loading: false })
     } catch (error) {
-      set({ error: 'Failed to create goal', loading: false })
+      set({ loading: false })
+      toast.error(getErrorMessage(error, 'Failed to load goals'))
     }
   },
 
-  fetchGoals: async (habitId) => {
-    set({ loading: true, error: null })
+  createGoal: async (data) => {
     try {
-      const goals = await goalService.getAll(habitId)
-      set((state) => ({
-        goals: {
-          ...state.goals,
-          [habitId]: goals,
-        },
-        loading: false,
-      }))
+      const goal = await goalService.create(data)
+      set((state) => ({ goals: [...state.goals, goal] }))
+      toast.success('Goal created')
+      return goal
     } catch (error) {
-      set({ error: 'Failed to fetch goals', loading: false })
+      toast.error(getErrorMessage(error, 'Failed to create goal'))
+      return null
     }
   },
 
-  fetchGoalProgress: async (habitId, goalId) => {
-    set({ loading: true, error: null })
+  updateGoal: async (id, data) => {
     try {
-      const progress = await goalService.getProgress(habitId, goalId)
+      const updated = await goalService.update(id, data)
       set((state) => ({
-        goalProgress: {
-          ...state.goalProgress,
-          [goalId]: progress,
-        },
-        loading: false,
+        goals: state.goals.map((g) => (g.id === id ? updated : g)),
       }))
+      toast.success('Goal updated')
     } catch (error) {
-      set({ error: 'Failed to fetch goal progress', loading: false })
+      toast.error(getErrorMessage(error, 'Failed to update goal'))
     }
   },
 
-  updateGoal: async (habitId, goalId, data) => {
-    set({ loading: true, error: null })
+  deleteGoal: async (id) => {
     try {
-      const updatedGoal = await goalService.update(habitId, goalId, data)
-      set((state) => ({
-        goals: {
-          ...state.goals,
-          [habitId]: (state.goals[habitId] || []).map((g) =>
-            g.id === goalId ? updatedGoal : g
-          ),
-        },
-        loading: false,
-      }))
+      await goalService.remove(id)
+      set((state) => ({ goals: state.goals.filter((g) => g.id !== id) }))
+      toast.success('Goal deleted')
     } catch (error) {
-      set({ error: 'Failed to update goal', loading: false })
-    }
-  },
-
-  deleteGoal: async (habitId, goalId) => {
-    set({ loading: true, error: null })
-    try {
-      await goalService.delete(habitId, goalId)
-      set((state) => ({
-        goals: {
-          ...state.goals,
-          [habitId]: (state.goals[habitId] || []).filter((g) => g.id !== goalId),
-        },
-        loading: false,
-      }))
-    } catch (error) {
-      set({ error: 'Failed to delete goal', loading: false })
+      toast.error(getErrorMessage(error, 'Failed to delete goal'))
     }
   },
 }))

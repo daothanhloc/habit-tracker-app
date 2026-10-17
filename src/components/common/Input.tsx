@@ -8,38 +8,38 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   onRightIconClick?: () => void
 }
 
-export const Input: React.FC<InputProps> = ({ 
-  label, 
-  error, 
-  icon, 
+export const Input: React.FC<InputProps> = ({
+  label,
+  error,
+  icon,
   rightIcon,
   onRightIconClick,
-  className = '', 
-  ...props 
+  className = '',
+  ...props
 }) => {
   return (
-    <div className="w-full group">
+    <div className="w-full">
       {label && (
-        <label className="block text-sm font-bold text-gray-700 mb-2 ml-1">
+        <label className="block text-sm font-medium text-foreground mb-1.5">
           {label}
         </label>
       )}
       <div className="relative">
         {icon && (
-          <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
+          <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground">
             {icon}
           </div>
         )}
         <input
           className={`
-            w-full px-4 py-3.5 rounded-xl bg-indigo-50/50 border-transparent
+            w-full px-3.5 py-2.5 rounded-lg bg-background border border-input
             outline-none
-            focus:bg-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500
-            transition-all duration-300 ease-out
-            placeholder:text-gray-400 font-medium text-gray-700
-            ${icon ? 'pl-12' : ''}
-            ${rightIcon ? 'pr-12' : ''}
-            ${error ? 'bg-red-50/50 ring-2 ring-red-100 focus:ring-red-200' : ''}
+            focus:ring-2 focus:ring-ring/30 focus:border-ring
+            transition-colors
+            placeholder:text-muted-foreground text-foreground
+            ${icon ? 'pl-11' : ''}
+            ${rightIcon ? 'pr-11' : ''}
+            ${error ? 'border-destructive focus:ring-destructive/20 focus:border-destructive' : ''}
             ${className}
           `}
           {...props}
@@ -48,14 +48,14 @@ export const Input: React.FC<InputProps> = ({
           <button
             type="button"
             onClick={onRightIconClick}
-            className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-indigo-600 transition-colors duration-200 focus:outline-none"
+            className="absolute right-3.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors focus:outline-none"
           >
             {rightIcon}
           </button>
         )}
       </div>
       {error && (
-        <p className="mt-2 ml-1 text-sm text-red-500 font-medium animate-slide-in-left">
+        <p className="mt-1.5 text-sm text-destructive">
           {error}
         </p>
       )}

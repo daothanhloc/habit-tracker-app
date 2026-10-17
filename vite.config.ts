@@ -1,9 +1,22 @@
+import path from 'node:path'
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import { VitePWA } from 'vite-plugin-pwa'
 
 export default defineConfig({
+  // Needed so the dev server accepts requests proxied through the
+  // cloudflared tunnel's *.trycloudflare.com Host header (Vite 6 rejects
+  // unrecognized Host headers by default). Dev-only; does not affect
+  // `vite preview` or the production build.
+  server: {
+    allowedHosts: true,
+  },
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, './src'),
+    },
+  },
   plugins: [
     react(),
     tailwindcss(),
@@ -14,8 +27,8 @@ export default defineConfig({
         name: 'Habit Tracker',
         short_name: 'Habits',
         description: 'Track your habits and maintain consistency',
-        theme_color: '#3B82F6',
-        background_color: '#ffffff',
+        theme_color: '#C2693F',
+        background_color: '#F5F3EC',
         display: 'standalone',
         orientation: 'portrait',
         scope: '/',

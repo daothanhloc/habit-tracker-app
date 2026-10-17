@@ -1,74 +1,97 @@
-import React, { useState } from 'react'
-import type { CreateGoalDto } from '../../types/goal'
-import { Input } from '../common/Input'
-import { Button } from '../common/Button'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
+import type { Goal } from '@/types/goal'
+
+const goalSchema = z
+  .object({
+    title: z.string().min(1, 'Title is required').max(255),
+    startDate: z.string().min(1, 'Start date is required'),
+    endDate: z.string().min(1, 'End date is required'),
+  })
+  .refine((data) => data.endDate >= data.startDate, {
+    message: 'End date must be on or after the start date',
+    path: ['endDate'],
+  })
+
+export type GoalFormValues = z.infer<typeof goalSchema>
 
 interface GoalFormProps {
-  onSubmit: (data: CreateGoalDto) => Promise<void>
+  goal?: Goal
+  onSubmit: (values: GoalFormValues) => Promise<void>
   onCancel: () => void
 }
 
-export const GoalForm: React.FC<GoalFormProps> = ({ onSubmit, onCancel }) => {
-  const [formData, setFormData] = useState<CreateGoalDto>({
-    targetFrequency: 5,
-    goalType: 'weekly',
+export function GoalForm({ goal, onSubmit, onCancel }: GoalFormProps) {
+  const form = useForm<GoalFormValues>({
+    resolver: zodResolver(goalSchema),
+    defaultValues: {
+      title: goal?.title ?? '',
+      startDate: goal?.startDate ?? '',
+      endDate: goal?.endDate ?? '',
+    },
   })
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError('')
-    setLoading(true)
-
-    try {
-      await onSubmit(formData)
-      onCancel()
-    } catch (err) {
-      setError('Failed to create goal')
-    } finally {
-      setLoading(false)
-    }
-  }
+  const handleSubmit = form.handleSubmit(async (values) => {
+    await onSubmit(values)
+  })
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <Input
-        label="Target Frequency"
-        type="number"
-        min="1"
-        value={formData.targetFrequency}
-        onChange={(e) => setFormData({ ...formData, targetFrequency: parseInt(e.target.value) })}
-        required
-      />
-
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          Goal Type
-        </label>
-        <select
-          value={formData.goalType}
-          onChange={(e) => setFormData({ ...formData, goalType: e.target.value as 'weekly' | 'monthly' | 'yearly' })}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-        >
-          <option value="weekly">Weekly</option>
-          <option value="monthly">Monthly</option>
-          <option value="yearly">Yearly</option>
-        </select>
-      </div>
-
-      {error && (
-        <p className="text-sm text-red-600">{error}</p>
-      )}
-
-      <div className="flex gap-2 pt-4">
-        <Button type="submit" disabled={loading} className="flex-1">
-          {loading ? 'Creating...' : 'Create Goal'}
-        </Button>
-        <Button type="button" variant="secondary" onClick={onCancel}>
-          Cancel
-        </Button>
-      </div>
-    </form>
+    <Form {...form}>
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <FormField
+          control={form.control}
+          name="title"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Title</FormLabel>
+              <FormControl>
+                <Input placeholder="e.g., Run 100km this month" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <div className="grid grid-cols-2 gap-4">
+          <FormField
+            control={form.control}
+            name="startDate"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Start date</FormLabel>
+                <FormControl>
+                  <Input type="date" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="endDate"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>End date</FormLabel>
+                <FormControl>
+                  <Input type="date" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+        <div className="flex justify-end gap-2 pt-2">
+          <Button type="button" variant="outline" onClick={onCancel}>
+            Cancel
+          </Button>
+          <Button type="submit" disabled={form.formState.isSubmitting}>
+            {goal ? 'Save changes' : 'Create goal'}
+          </Button>
+        </div>
+      </form>
+    </Form>
   )
 }
