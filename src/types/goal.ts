@@ -5,7 +5,6 @@ export interface Goal {
   title: string
   startDate: string // YYYY-MM-DD
   endDate: string // YYYY-MM-DD
-  unifiedProgress: { current: number; target: number } | null
   habits: HabitSummary[]
   createdAt: string
   updatedAt: string

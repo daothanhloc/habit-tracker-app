@@ -21,26 +21,19 @@ export function GoalCard({ goal }: GoalCardProps) {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {goal.unifiedProgress ? (
-            <div className="space-y-1.5">
-              <div className="flex justify-between text-sm text-muted-foreground">
-                <span>Progress</span>
-                <span>
-                  {goal.unifiedProgress.current} / {goal.unifiedProgress.target}
-                </span>
-              </div>
-              <Progress
-                value={progressPercent(goal.unifiedProgress.current, goal.unifiedProgress.target)}
-              />
-            </div>
-          ) : goal.habits.length > 0 ? (
+          {goal.habits.length > 0 ? (
             <div className="space-y-2.5">
               {goal.habits.map((habit) => (
                 <div key={habit.id} className="space-y-1">
-                  <div className="flex justify-between text-xs text-muted-foreground">
+                  <div className="flex justify-between gap-2 text-xs text-muted-foreground">
                     <span>{habit.name}</span>
-                    <span>
-                      {habit.progress.current} / {formatProgressTarget(habit.progress.target)}
+                    <span className="flex gap-3">
+                      <span>
+                        {habit.progress.current} / {formatProgressTarget(habit.progress.target)}
+                      </span>
+                      <span data-testid={`streak-${habit.id}`} title="Current streak">
+                        🔥 {habit.currentStreak}
+                      </span>
                     </span>
                   </div>
                   <Progress
