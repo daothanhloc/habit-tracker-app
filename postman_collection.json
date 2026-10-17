@@ -1,16 +1,15 @@
 {
   "info": {
     "name": "Habit Tracker API",
-    "description": "Complete API collection for testing all Habit Tracker endpoints",
+    "description": "V2 API collection (Goals \u2192 Habits \u2192 Tasks). Run Signup or Login first; the token and IDs are saved to collection variables automatically.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
     {
-      "name": "Habits",
-      "description": "CRUD operations for habits",
+      "name": "Auth",
       "item": [
         {
-          "name": "Create Habit",
+          "name": "Signup",
           "request": {
             "method": "POST",
             "header": [
@@ -19,115 +18,39 @@
                 "value": "application/json"
               }
             ],
+            "url": {
+              "raw": "{{base_url}}/auth/signup",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "signup"
+              ]
+            },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"Morning Exercise\",\n  \"description\": \"30 min workout at the gym\",\n  \"frequency\": \"daily\",\n  \"category\": \"health\",\n  \"color\": \"#3B82F6\"\n}"
+              "raw": "{\n  \"email\": \"test@example.com\",\n  \"password\": \"password123\",\n  \"name\": \"Test User\"\n}"
             },
-            "url": {
-              "raw": "{{base_url}}/habits",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "habits"
-              ]
-            },
-            "description": "Create a new habit"
+            "description": "Register a user. Saves access_token and refresh_token."
           },
-          "response": []
-        },
-        {
-          "name": "Get All Habits",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/habits",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "habits"
-              ]
-            },
-            "description": "Get all habits for the user"
-          },
-          "response": []
-        },
-        {
-          "name": "Get Habit by ID",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/habits/{{habit_id}}",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "habits",
-                "{{habit_id}}"
-              ]
-            },
-            "description": "Get a specific habit by ID"
-          },
-          "response": []
-        },
-        {
-          "name": "Update Habit",
-          "request": {
-            "method": "PUT",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json.accessToken) pm.collectionVariables.set('access_token', json.accessToken);",
+                  "if (json.refreshToken) pm.collectionVariables.set('refresh_token', json.refreshToken);"
+                ]
               }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"name\": \"Updated Morning Exercise\",\n  \"description\": \"45 min workout at the gym\",\n  \"frequency\": \"daily\"\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/habits/{{habit_id}}",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "habits",
-                "{{habit_id}}"
-              ]
-            },
-            "description": "Update an existing habit"
-          },
-          "response": []
+            }
+          ]
         },
         {
-          "name": "Delete Habit",
-          "request": {
-            "method": "DELETE",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/habits/{{habit_id}}",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "habits",
-                "{{habit_id}}"
-              ]
-            },
-            "description": "Delete a habit"
-          },
-          "response": []
-        }
-      ]
-    },
-    {
-      "name": "Habit Tracking",
-      "description": "Log and view habit completions",
-      "item": [
-        {
-          "name": "Log Habit Completion",
+          "name": "Login",
           "request": {
             "method": "POST",
             "header": [
@@ -136,77 +59,112 @@
                 "value": "application/json"
               }
             ],
+            "url": {
+              "raw": "{{base_url}}/auth/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"notes\": \"Great workout today! Felt strong and energized.\",\n  \"completedAt\": \"2025-01-01T18:30:00Z\"\n}"
+              "raw": "{\n  \"email\": \"test@example.com\",\n  \"password\": \"password123\"\n}"
             },
-            "url": {
-              "raw": "{{base_url}}/habits/{{habit_id}}/track",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "habits",
-                "{{habit_id}}",
-                "track"
-              ]
-            },
-            "description": "Log a habit completion. Leave completedAt empty to use current time."
+            "description": "Saves access_token and refresh_token."
           },
-          "response": []
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json.accessToken) pm.collectionVariables.set('access_token', json.accessToken);",
+                  "if (json.refreshToken) pm.collectionVariables.set('refresh_token', json.refreshToken);"
+                ]
+              }
+            }
+          ]
         },
         {
-          "name": "Get Habit Tracking History",
+          "name": "Refresh Token",
           "request": {
-            "method": "GET",
-            "header": [],
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "url": {
-              "raw": "{{base_url}}/habits/{{habit_id}}/history?limit=30",
+              "raw": "{{base_url}}/auth/refresh",
               "host": [
                 "{{base_url}}"
               ],
               "path": [
-                "habits",
-                "{{habit_id}}",
-                "history"
-              ],
-              "query": [
-                {
-                  "key": "limit",
-                  "value": "30",
-                  "description": "Number of records to return (1-100)"
-                }
+                "auth",
+                "refresh"
               ]
             },
-            "description": "Get tracking history for a habit (last 30 records by default)"
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"{{refresh_token}}\"\n}"
+            }
           },
-          "response": []
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json.accessToken) pm.collectionVariables.set('access_token', json.accessToken);",
+                  "if (json.refreshToken) pm.collectionVariables.set('refresh_token', json.refreshToken);"
+                ]
+              }
+            }
+          ]
         },
         {
-          "name": "Get Current Streak",
+          "name": "Logout",
           "request": {
-            "method": "GET",
-            "header": [],
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
             "url": {
-              "raw": "{{base_url}}/habits/{{habit_id}}/streak",
+              "raw": "{{base_url}}/auth/logout",
               "host": [
                 "{{base_url}}"
               ],
               "path": [
-                "habits",
-                "{{habit_id}}",
-                "streak"
+                "auth",
+                "logout"
               ]
             },
-            "description": "Get the current streak for a habit"
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"{{refresh_token}}\"\n}"
+            }
           },
           "response": []
         }
       ]
     },
     {
-      "name": "Habit Goals",
-      "description": "Set and track consistency goals",
+      "name": "Goals",
       "item": [
         {
           "name": "Create Goal",
@@ -216,65 +174,84 @@
               {
                 "key": "Content-Type",
                 "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
               }
             ],
+            "url": {
+              "raw": "{{base_url}}/goals",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "goals"
+              ]
+            },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"targetFrequency\": 5,\n  \"goalType\": \"weekly\"\n}"
+              "raw": "{\n  \"title\": \"Get Fit\",\n  \"startDate\": \"2026-10-01\",\n  \"endDate\": \"2026-10-31\"\n}"
             },
+            "description": "Dates are YYYY-MM-DD. Saves goal_id."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json && json.id) pm.collectionVariables.set('goal_id', json.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "List Goals",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
             "url": {
-              "raw": "{{base_url}}/habits/{{habit_id}}/goals",
+              "raw": "{{base_url}}/goals",
               "host": [
                 "{{base_url}}"
               ],
               "path": [
-                "habits",
-                "{{habit_id}}",
                 "goals"
               ]
             },
-            "description": "Create a new consistency goal for a habit. goalType can be: weekly, monthly, yearly"
+            "description": "All goals for the user, each with its habits."
           },
           "response": []
         },
         {
-          "name": "Get All Goals for Habit",
+          "name": "Get Goal by ID",
           "request": {
             "method": "GET",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
             "url": {
-              "raw": "{{base_url}}/habits/{{habit_id}}/goals",
+              "raw": "{{base_url}}/goals/{{goal_id}}",
               "host": [
                 "{{base_url}}"
               ],
               "path": [
-                "habits",
-                "{{habit_id}}",
-                "goals"
-              ]
-            },
-            "description": "Get all goals for a specific habit"
-          },
-          "response": []
-        },
-        {
-          "name": "Get Goal Progress",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/habits/{{habit_id}}/goals/{{goal_id}}",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "habits",
-                "{{habit_id}}",
                 "goals",
                 "{{goal_id}}"
               ]
-            },
-            "description": "Get progress towards a specific goal"
+            }
           },
           "response": []
         },
@@ -286,25 +263,27 @@
               {
                 "key": "Content-Type",
                 "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
               }
             ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"targetFrequency\": 6\n}"
-            },
             "url": {
-              "raw": "{{base_url}}/habits/{{habit_id}}/goals/{{goal_id}}",
+              "raw": "{{base_url}}/goals/{{goal_id}}",
               "host": [
                 "{{base_url}}"
               ],
               "path": [
-                "habits",
-                "{{habit_id}}",
                 "goals",
                 "{{goal_id}}"
               ]
             },
-            "description": "Update an existing goal"
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Get Fitter\"\n}"
+            },
+            "description": "All fields optional."
           },
           "response": []
         },
@@ -312,20 +291,321 @@
           "name": "Delete Goal",
           "request": {
             "method": "DELETE",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
             "url": {
-              "raw": "{{base_url}}/habits/{{habit_id}}/goals/{{goal_id}}",
+              "raw": "{{base_url}}/goals/{{goal_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "goals",
+                "{{goal_id}}"
+              ]
+            },
+            "description": "Cascades to the goal's habits and tasks. Returns 204."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Habits",
+      "item": [
+        {
+          "name": "Create Habit (SUM)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/goals/{{goal_id}}/habits",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "goals",
+                "{{goal_id}}",
+                "habits"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Run\",\n  \"goalType\": \"sum\",\n  \"unit\": \"km\",\n  \"targetValue\": 100,\n  \"frequencyDays\": [\n    1,\n    3,\n    5\n  ],\n  \"defaultTaskValue\": 5\n}"
+            },
+            "description": "goalId is a URL path param, NOT a body field. goalType is lowercase in requests ('sum' | 'threshold_count'); responses are uppercase. frequencyDays: 0=Sun..6=Sat. Saves habit_id."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json && json.id) pm.collectionVariables.set('habit_id', json.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create Habit (THRESHOLD_COUNT)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/goals/{{goal_id}}/habits",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "goals",
+                "{{goal_id}}",
+                "habits"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Sleep\",\n  \"goalType\": \"threshold_count\",\n  \"unit\": \"hours\",\n  \"dailyMinValue\": 7,\n  \"targetDays\": 20,\n  \"frequencyDays\": [\n    0,\n    1,\n    2,\n    3,\n    4,\n    5,\n    6\n  ],\n  \"defaultTaskValue\": 8\n}"
+            },
+            "description": "A day counts if its task value >= dailyMinValue; targetDays is how many qualifying days are needed."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json && json.id) pm.collectionVariables.set('habit_id', json.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "List Habits for Goal",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/goals/{{goal_id}}/habits",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "goals",
+                "{{goal_id}}",
+                "habits"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Habit by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/habits/{{habit_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "habits",
+                "{{habit_id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Habit",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/habits/{{habit_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "habits",
+                "{{habit_id}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Run (updated)\",\n  \"frequencyDays\": [\n    1,\n    2,\n    3,\n    4,\n    5\n  ]\n}"
+            },
+            "description": "All fields optional. Changing frequencyDays drops NOT_DONE tasks so they regenerate; DONE tasks are untouched."
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Habit",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/habits/{{habit_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "habits",
+                "{{habit_id}}"
+              ]
+            },
+            "description": "Returns 204."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Tasks",
+      "item": [
+        {
+          "name": "List Tasks in Range",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/habits/{{habit_id}}/tasks?from=2026-10-01&to=2026-10-31",
               "host": [
                 "{{base_url}}"
               ],
               "path": [
                 "habits",
                 "{{habit_id}}",
-                "goals",
-                "{{goal_id}}"
+                "tasks"
+              ],
+              "query": [
+                {
+                  "key": "from",
+                  "value": "2026-10-01"
+                },
+                {
+                  "key": "to",
+                  "value": "2026-10-31"
+                }
               ]
             },
-            "description": "Delete a goal"
+            "description": "Lazily creates tasks for scheduled dates up to today (Vietnam time)."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Today's Task",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/habits/{{habit_id}}/tasks/today",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "habits",
+                "{{habit_id}}",
+                "tasks",
+                "today"
+              ]
+            },
+            "description": "404 if the habit is not scheduled today."
+          },
+          "response": []
+        },
+        {
+          "name": "Upsert Task",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/habits/{{habit_id}}/tasks/2026-10-16",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "habits",
+                "{{habit_id}}",
+                "tasks",
+                "2026-10-16"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"value\": 5,\n  \"status\": \"done\"\n}"
+            },
+            "description": "status is lowercase in requests ('done' | 'not_done'). Rejects future dates (400) and dates not in frequencyDays (404)."
           },
           "response": []
         }
@@ -337,19 +617,31 @@
       "key": "base_url",
       "value": "http://localhost:3000",
       "type": "string",
-      "description": "Base URL for the API"
+      "description": "Base URL for the API (e.g. https://habit-tracker-api-hazel.vercel.app)"
     },
     {
-      "key": "habit_id",
+      "key": "access_token",
       "value": "",
       "type": "string",
-      "description": "ID of a habit (from Create Habit response)"
+      "description": "Set by Signup/Login/Refresh"
+    },
+    {
+      "key": "refresh_token",
+      "value": "",
+      "type": "string",
+      "description": "Set by Signup/Login/Refresh"
     },
     {
       "key": "goal_id",
       "value": "",
       "type": "string",
-      "description": "ID of a goal (from Create Goal response)"
+      "description": "Set by Create Goal"
+    },
+    {
+      "key": "habit_id",
+      "value": "",
+      "type": "string",
+      "description": "Set by Create Habit"
     }
   ]
 }

@@ -87,7 +87,6 @@ export interface Goal {
   title: string
   startDate: string   // YYYY-MM-DD
   endDate: string      // YYYY-MM-DD
-  unifiedProgress: { current: number; target: number } | null
   habits: HabitSummary[]
   createdAt: string
   updatedAt: string
@@ -104,7 +103,9 @@ export type UpdateGoalDto = Partial<CreateGoalDto>
 
 ```typescript
 // src/types/habit.ts
-export type HabitGoalType = 'sum' | 'threshold_count'
+// Responses use UPPERCASE enums; requests take lowercase.
+export type HabitGoalType = 'SUM' | 'THRESHOLD_COUNT'
+export type HabitGoalTypeInput = 'sum' | 'threshold_count'
 
 export interface HabitSummary {
   id: string
@@ -136,8 +137,8 @@ interface HabitBaseDto {
 
 export type CreateHabitDto = HabitBaseDto &
   (
-    | { goalType: 'sum'; targetValue: number; dailyMinValue?: never; targetDays?: never }
-    | { goalType: 'threshold_count'; dailyMinValue: number; targetDays: number; targetValue?: never }
+    | { goalType: Extract<HabitGoalTypeInput, 'sum'>; targetValue: number; dailyMinValue?: never; targetDays?: never }
+    | { goalType: Extract<HabitGoalTypeInput, 'threshold_count'>; dailyMinValue: number; targetDays: number; targetValue?: never }
   )
 
 export type UpdateHabitDto = Partial<CreateHabitDto>
@@ -145,7 +146,9 @@ export type UpdateHabitDto = Partial<CreateHabitDto>
 
 ```typescript
 // src/types/task.ts
-export type TaskStatus = 'done' | 'not_done'
+// Responses use UPPERCASE enums; requests take lowercase.
+export type TaskStatus = 'DONE' | 'NOT_DONE'
+export type TaskStatusInput = 'done' | 'not_done'
 
 export interface Task {
   id: string
@@ -158,7 +161,7 @@ export interface Task {
 
 export interface UpsertTaskDto {
   value?: number | null
-  status?: TaskStatus
+  status?: TaskStatusInput
 }
 ```
 
@@ -243,10 +246,10 @@ identical — `AuthContainer` short-circuits before the router mounts):
 
 Grid of `GoalCard` (shadcn `Card`). Each card:
 - Title, date range (`startDate`–`endDate` formatted with `date-fns`).
-- If `unifiedProgress` is non-null: one shadcn `Progress` bar + "`current`/`target`".
-- If `unifiedProgress` is null: stacked mini-rows, one per habit, each a
-  small `Progress` + habit name (matches API doc §5.4 example response) —
-  no single number, by design (spec §3.3).
+- One row per habit: name, "`current` / `target`" (`formatProgressTarget`),
+  a thin `Progress` bar (`progressPercent`) and `currentStreak`. "No habits
+  yet" when the goal has none. A goal is a container: there is no goal-level
+  progress.
 - "New Goal" button → `Dialog` with `GoalForm` (title + start/end date
   inputs via shadcn `Input type="date"`, zod: `endDate >= startDate`).
 - Card click → `/goals/:goalId`.
@@ -255,7 +258,7 @@ Grid of `GoalCard` (shadcn `Card`). Each card:
 
 - Header: title, date range, edit/delete (delete → `AlertDialog`, copy warns
   "This deletes N habits and all their tracked tasks").
-- `unifiedProgress` banner if present.
+- No goal-level progress block; progress lives on each habit.
 - List of `HabitCard` (name, unit, goalType badge, `Progress`, streak pair —
   see §5.3) each linking to `/habits/:habitId`.
 - "Add Habit" button → `Dialog` with `HabitForm` (§5.3).
@@ -318,9 +321,9 @@ know about before confirming an edit.
   month**, not the full goal period (see §6, resolves API doc open item #1
   from the frontend side: request narrow ranges, let lazy-creation handle
   the rest on scroll/navigate).
-  - Cell states: `done` (filled, habit-colored... actually no per-habit
+  - Cell states: `DONE` (filled, habit-colored... actually no per-habit
     color anymore since `color` field is dropped — use a single accent,
-    e.g. `bg-primary`), `not_done` + past (muted red outline), `not_done` +
+    e.g. `bg-primary`), `NOT_DONE` + past (muted red outline), `NOT_DONE` +
     future/today (neutral), **not in `frequencyDays`** (disabled, no click
     handler, dimmed — per API doc open item #2, assume `PUT` 404s on
     off-schedule dates, so don't let the UI attempt it).
@@ -368,7 +371,7 @@ Per spec §6 ("explicitly dropped, not carried over from v1"):
   away with it — habit identity in lists is now name + unit + goalType
   badge, not a colored left-border.
 - `GoalProgress.tsx`'s `targetFrequency`/weekly-monthly-yearly model —
-  superseded by `unifiedProgress` computed server-side.
+  superseded by per-habit `progress` computed server-side.
 
 ## 8. Migration Order
 
@@ -395,10 +398,9 @@ npm run preview
 ```
 
 Manual QA pass:
-1. Create a Goal, add two Habits with the **same** `unit`+`goalType` →
-   `unifiedProgress` renders as one bar on `GoalListPage`/`GoalDetailPage`.
-2. Add a third Habit with a different `unit` to the same Goal →
-   `unifiedProgress` becomes `null`, UI falls back to per-habit rows.
+1. Create a Goal, add two Habits → `GoalListPage` card and `GoalDetailPage`
+   show one row per habit (progress + streak) and no goal-level bar.
+2. A Goal with no habits shows "No habits yet".
 3. Create one `sum` habit and one `threshold_count` habit → form correctly
    switches required fields; both validate and submit.
 4. On `HabitDetailPage`, mark today's task done with a value for a `sum`
@@ -407,7 +409,7 @@ Manual QA pass:
 5. Visit a date outside `frequencyDays` in the calendar → cell is disabled,
    no click handler fires.
 6. Edit a habit's `frequencyDays` → confirm the warning copy shows, and
-   previously-visible `not_done` future cells disappear/regenerate correctly
+   previously-visible `NOT_DONE` future cells disappear/regenerate correctly
    on next fetch.
 7. Delete a Goal with habits/tasks → `AlertDialog` warning shown, cascade
    confirmed (goal disappears from list).

@@ -15,14 +15,12 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
-import { Progress } from '@/components/ui/progress'
 import { Skeleton } from '@/components/ui/skeleton'
 import { GoalForm, type GoalFormValues } from '@/components/goals/GoalForm'
 import { HabitForm } from '@/components/habits/HabitForm'
 import { HabitCard } from '@/components/habits/HabitCard'
 import { useGoalStore } from '@/store/goalStore'
 import { useHabitStore } from '@/store/habitStore'
-import { progressPercent } from '@/lib/progress'
 import type { CreateHabitDto } from '@/types/habit'
 
 export function GoalDetailPage() {
@@ -129,20 +127,6 @@ export function GoalDetailPage() {
           </AlertDialog>
         </div>
       </div>
-
-      {goal.unifiedProgress && (
-        <div className="space-y-1.5 rounded-lg border bg-card p-4">
-          <div className="flex justify-between text-sm text-muted-foreground">
-            <span>Overall progress</span>
-            <span>
-              {goal.unifiedProgress.current} / {goal.unifiedProgress.target}
-            </span>
-          </div>
-          <Progress
-            value={progressPercent(goal.unifiedProgress.current, goal.unifiedProgress.target)}
-          />
-        </div>
-      )}
 
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-medium">Habits</h3>

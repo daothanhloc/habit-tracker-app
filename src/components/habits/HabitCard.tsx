@@ -7,8 +7,8 @@ import { formatProgressTarget, progressPercent } from '@/lib/progress'
 import type { HabitSummary } from '@/types/habit'
 
 const GOAL_TYPE_LABEL: Record<HabitSummary['goalType'], string> = {
-  sum: 'Total target',
-  threshold_count: 'Daily minimum',
+  SUM: 'Total target',
+  THRESHOLD_COUNT: 'Daily minimum',
 }
 
 interface HabitCardProps {

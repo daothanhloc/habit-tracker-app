@@ -1,4 +1,6 @@
-export type TaskStatus = 'done' | 'not_done'
+// Responses use UPPERCASE enums; requests take lowercase.
+export type TaskStatus = 'DONE' | 'NOT_DONE'
+export type TaskStatusInput = 'done' | 'not_done'
 
 export interface Task {
   id: string
@@ -11,5 +13,5 @@ export interface Task {
 
 export interface UpsertTaskDto {
   value?: number | null
-  status?: TaskStatus
+  status?: TaskStatusInput
 }

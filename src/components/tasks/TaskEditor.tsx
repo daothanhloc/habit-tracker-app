@@ -1,8 +1,9 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { format, parseISO } from 'date-fns'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
+import { isTaskDone, isThreshold, toTaskStatusInput } from '@/lib/enums'
 import type { Task, UpsertTaskDto } from '@/types/task'
 import type { HabitSummary } from '@/types/habit'
 
@@ -22,7 +23,7 @@ interface TaskEditorProps {
 function initialValue(task: Task, habit: TaskEditorProps['habit']): string {
   if (task.value != null) return String(task.value)
   if (habit.defaultTaskValue != null) return String(habit.defaultTaskValue)
-  if (habit.goalType === 'threshold_count' && habit.dailyMinValue != null) {
+  if (isThreshold(habit.goalType) && habit.dailyMinValue != null) {
     return String(habit.dailyMinValue)
   }
   return ''
@@ -30,29 +31,32 @@ function initialValue(task: Task, habit: TaskEditorProps['habit']): string {
 
 export function TaskEditor({ task, habit, onSave }: TaskEditorProps) {
   const [value, setValue] = useState(() => initialValue(task, habit))
-  const [saving, setSaving] = useState(false)
-  const done = task.status === 'done'
+  const [pending, setPending] = useState(0)
+  // Saves are chained so they reach the server in the order the user made
+  // them (a late value-only response must never overwrite a later status).
+  const chain = useRef<Promise<unknown>>(Promise.resolve())
+  const saving = pending > 0
+  const done = isTaskDone(task)
 
-  const handleToggle = async (checked: boolean) => {
-    setSaving(true)
+  const enqueue = async (data: UpsertTaskDto) => {
+    setPending((n) => n + 1)
+    const run = chain.current.then(() => onSave(data))
+    chain.current = run.catch(() => undefined)
     try {
-      await onSave({
-        status: checked ? 'done' : 'not_done',
-        value: value.trim() === '' ? null : Number(value),
-      })
+      await run
     } finally {
-      setSaving(false)
+      setPending((n) => n - 1)
     }
   }
 
-  const handleValueBlur = async () => {
-    setSaving(true)
-    try {
-      await onSave({ value: value.trim() === '' ? null : Number(value) })
-    } finally {
-      setSaving(false)
-    }
-  }
+  const currentValue = () => (value.trim() === '' ? null : Number(value))
+
+  // Controls are never disabled while saving: the value input's blur fires
+  // when the user presses the switch, and a disabled switch would drop that click.
+  const handleToggle = (checked: boolean) =>
+    enqueue({ status: toTaskStatusInput(checked), value: currentValue() })
+
+  const handleValueBlur = () => enqueue({ value: currentValue() })
 
   return (
     <div className="space-y-3">
@@ -65,7 +69,7 @@ export function TaskEditor({ task, habit, onSave }: TaskEditorProps) {
           value={value}
           onChange={(e) => setValue(e.target.value)}
           onBlur={handleValueBlur}
-          disabled={saving}
+          aria-busy={saving}
         />
       </div>
       <div className="flex items-center justify-between">
@@ -74,7 +78,7 @@ export function TaskEditor({ task, habit, onSave }: TaskEditorProps) {
           id={`task-status-${task.id}`}
           checked={done}
           onCheckedChange={handleToggle}
-          disabled={saving}
+          aria-busy={saving}
         />
       </div>
       {task.completedAt && (
