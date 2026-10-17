@@ -1,4 +1,6 @@
-export type HabitGoalType = 'sum' | 'threshold_count'
+// Responses use UPPERCASE enums; requests take lowercase.
+export type HabitGoalType = 'SUM' | 'THRESHOLD_COUNT'
+export type HabitGoalTypeInput = 'sum' | 'threshold_count'
 
 export interface HabitSummary {
   id: string
@@ -32,8 +34,8 @@ interface HabitBaseDto {
 
 export type CreateHabitDto = HabitBaseDto &
   (
-    | { goalType: 'sum'; targetValue: number; dailyMinValue?: never; targetDays?: never }
-    | { goalType: 'threshold_count'; dailyMinValue: number; targetDays: number; targetValue?: never }
+    | { goalType: Extract<HabitGoalTypeInput, 'sum'>; targetValue: number; dailyMinValue?: never; targetDays?: never }
+    | { goalType: Extract<HabitGoalTypeInput, 'threshold_count'>; dailyMinValue: number; targetDays: number; targetValue?: never }
   )
 
 export type UpdateHabitDto = Partial<CreateHabitDto>

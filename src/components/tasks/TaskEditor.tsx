@@ -3,6 +3,7 @@ import { format, parseISO } from 'date-fns'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
+import { isTaskDone, isThreshold, toTaskStatusInput } from '@/lib/enums'
 import type { Task, UpsertTaskDto } from '@/types/task'
 import type { HabitSummary } from '@/types/habit'
 
@@ -22,7 +23,7 @@ interface TaskEditorProps {
 function initialValue(task: Task, habit: TaskEditorProps['habit']): string {
   if (task.value != null) return String(task.value)
   if (habit.defaultTaskValue != null) return String(habit.defaultTaskValue)
-  if (habit.goalType === 'threshold_count' && habit.dailyMinValue != null) {
+  if (isThreshold(habit.goalType) && habit.dailyMinValue != null) {
     return String(habit.dailyMinValue)
   }
   return ''
@@ -31,13 +32,13 @@ function initialValue(task: Task, habit: TaskEditorProps['habit']): string {
 export function TaskEditor({ task, habit, onSave }: TaskEditorProps) {
   const [value, setValue] = useState(() => initialValue(task, habit))
   const [saving, setSaving] = useState(false)
-  const done = task.status === 'done'
+  const done = isTaskDone(task)
 
   const handleToggle = async (checked: boolean) => {
     setSaving(true)
     try {
       await onSave({
-        status: checked ? 'done' : 'not_done',
+        status: toTaskStatusInput(checked),
         value: value.trim() === '' ? null : Number(value),
       })
     } finally {

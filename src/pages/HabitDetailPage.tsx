@@ -26,8 +26,8 @@ import { formatProgressTarget, progressPercent } from '@/lib/progress'
 import type { CreateHabitDto, HabitGoalType } from '@/types/habit'
 
 const GOAL_TYPE_LABEL: Record<HabitGoalType, string> = {
-  sum: 'Total target',
-  threshold_count: 'Daily minimum',
+  SUM: 'Total target',
+  THRESHOLD_COUNT: 'Daily minimum',
 }
 
 export function HabitDetailPage() {

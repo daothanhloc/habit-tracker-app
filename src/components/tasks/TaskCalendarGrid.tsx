@@ -14,6 +14,7 @@ import {
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { isTaskDone } from '@/lib/enums'
 import { cn } from '@/lib/utils'
 import { TaskEditor } from './TaskEditor'
 import { useTaskStore } from '@/store/taskStore'
@@ -105,9 +106,9 @@ export function TaskCalendarGrid({ habit }: TaskCalendarGridProps) {
             isFuture && 'cursor-not-allowed border-dashed text-muted-foreground',
             isScheduled &&
               !isFuture &&
-              task?.status === 'done' &&
+              task && isTaskDone(task) &&
               'border-primary bg-primary text-primary-foreground',
-            isScheduled && !isFuture && task?.status !== 'done' && 'border-dashed'
+            isScheduled && !isFuture && !(task && isTaskDone(task)) && 'border-dashed'
           )
 
           // Off-schedule and future days can't be logged — disable the cell
