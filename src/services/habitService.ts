@@ -1,19 +1,19 @@
 import { apiClient } from './api'
-import type { Habit, CreateHabitDto, UpdateHabitDto } from '../types/habit'
+import type { Habit, HabitSummary, CreateHabitDto, UpdateHabitDto } from '../types/habit'
 
 export const habitService = {
-  getAll: async (): Promise<Habit[]> => {
-    const response = await apiClient.get('/habits')
+  listForGoal: async (goalId: string): Promise<HabitSummary[]> => {
+    const response = await apiClient.get(`/goals/${goalId}/habits`)
     return response.data
   },
 
-  getById: async (id: string): Promise<Habit> => {
+  createForGoal: async (goalId: string, data: CreateHabitDto): Promise<Habit> => {
+    const response = await apiClient.post(`/goals/${goalId}/habits`, data)
+    return response.data
+  },
+
+  get: async (id: string): Promise<Habit> => {
     const response = await apiClient.get(`/habits/${id}`)
-    return response.data
-  },
-
-  create: async (data: CreateHabitDto): Promise<Habit> => {
-    const response = await apiClient.post('/habits', data)
     return response.data
   },
 
@@ -22,7 +22,7 @@ export const habitService = {
     return response.data
   },
 
-  delete: async (id: string): Promise<void> => {
+  remove: async (id: string): Promise<void> => {
     await apiClient.delete(`/habits/${id}`)
   },
 }

@@ -1,22 +1,20 @@
-export interface HabitGoal {
+import type { HabitSummary } from './habit'
+
+export interface Goal {
   id: string
-  habitId: string
-  targetFrequency: number
-  goalType: 'weekly' | 'monthly' | 'yearly'
+  title: string
+  startDate: string // YYYY-MM-DD
+  endDate: string // YYYY-MM-DD
+  unifiedProgress: { current: number; target: number } | null
+  habits: HabitSummary[]
   createdAt: string
   updatedAt: string
 }
 
-export interface GoalProgress {
-  goal: HabitGoal
-  currentProgress: number
-  percentage: number
-  isAchieved: boolean
-}
-
 export interface CreateGoalDto {
-  targetFrequency: number
-  goalType: 'weekly' | 'monthly' | 'yearly'
+  title: string
+  startDate: string
+  endDate: string
 }
 
-export interface UpdateGoalDto extends Partial<CreateGoalDto> {}
+export type UpdateGoalDto = Partial<CreateGoalDto>

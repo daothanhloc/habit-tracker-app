@@ -1,18 +1,20 @@
 import { useEffect } from 'react'
-import { useHabitStore } from './store/habitStore'
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
+import { Toaster } from '@/components/ui/sonner'
 import { useAuthStore } from './store/authStore'
 import { useAuthInit } from './hooks/useAuthInit'
 import { Layout } from './components/layout/Layout'
-import { HabitList } from './components/habits/HabitList'
 import { AuthContainer } from './components/auth/AuthContainer'
 import { LoadingSpinner } from './components/common/LoadingSpinner'
+import { GoalListPage } from './pages/GoalListPage'
+import { GoalDetailPage } from './pages/GoalDetailPage'
+import { HabitDetailPage } from './pages/HabitDetailPage'
 
 function App() {
   // Initialize auth on app load
   useAuthInit()
 
   const { isAuthenticated, isLoading: authLoading } = useAuthStore()
-  const fetchHabits = useHabitStore((state) => state.fetchHabits)
 
   // Expose auth store to window for axios interceptors (solve circular dependency)
   useEffect(() => {
@@ -38,16 +40,10 @@ function App() {
     }
   }, [])
 
-  useEffect(() => {
-    if (isAuthenticated) {
-      fetchHabits()
-    }
-  }, [isAuthenticated, fetchHabits])
-
   // Show loading spinner during auth initialization
   if (authLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-50">
+      <div className="min-h-screen flex items-center justify-center bg-background">
         <LoadingSpinner />
       </div>
     )
@@ -55,18 +51,27 @@ function App() {
 
   // Show auth screens if not authenticated
   if (!isAuthenticated) {
-    return <AuthContainer />
+    return (
+      <>
+        <AuthContainer />
+        <Toaster position="top-center" richColors />
+      </>
+    )
   }
 
-  // Show main app if authenticated
   return (
-    <div className="min-h-screen bg-gray-50">
+    <BrowserRouter>
       <Layout>
-        <div className="mt-6">
-          <HabitList />
-        </div>
+        <Routes>
+          <Route path="/" element={<Navigate to="/goals" replace />} />
+          <Route path="/goals" element={<GoalListPage />} />
+          <Route path="/goals/:goalId" element={<GoalDetailPage />} />
+          <Route path="/habits/:habitId" element={<HabitDetailPage />} />
+          <Route path="*" element={<Navigate to="/goals" replace />} />
+        </Routes>
       </Layout>
-    </div>
+      <Toaster position="top-center" richColors />
+    </BrowserRouter>
   )
 }
 

@@ -16,7 +16,7 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSwitchToLogin }) => {
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [agreeTerms, setAgreeTerms] = useState(false)
-  
+
   const [validationErrors, setValidationErrors] = useState<{
     name?: string
     email?: string
@@ -72,24 +72,27 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSwitchToLogin }) => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-400 to-indigo-600 px-4">
-      <div className="w-full max-w-md animate-scale-in">
-        <div className="bg-white rounded-3xl shadow-2xl p-8 lg:p-10">
+    <div className="min-h-screen flex items-center justify-center bg-background px-4">
+      <div className="w-full max-w-md">
+        <div className="bg-card border border-border rounded-xl shadow-sm p-8">
           {/* Header */}
-          <div className="text-center mb-10">
-            <h2 className="text-3xl font-bold text-gray-900 mb-2">Create Account</h2>
-            <p className="text-gray-500 font-medium">Fill your information below or register with your social accounts</p>
+          <div className="text-center mb-8">
+            <span className="mx-auto mb-4 flex size-10 items-center justify-center rounded-lg bg-primary text-primary-foreground text-base font-semibold">
+              H
+            </span>
+            <h2 className="text-2xl font-semibold text-foreground mb-1">Create your account</h2>
+            <p className="text-sm text-muted-foreground">Start tracking goals and habits that matter</p>
           </div>
 
           {/* Error Message */}
           {error && (
-            <div className="mb-6 p-4 bg-red-50 border border-red-100 rounded-2xl animate-pulse">
-              <p className="text-red-600 text-sm font-bold text-center">{error}</p>
+            <div className="mb-6 p-3 bg-destructive/10 border border-destructive/20 rounded-lg">
+              <p className="text-destructive text-sm text-center">{error}</p>
             </div>
           )}
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-5">
             <Input
               label="Name"
               type="text"
@@ -103,7 +106,7 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSwitchToLogin }) => {
             <Input
               label="Email"
               type="email"
-              placeholder="example@gmail.com"
+              placeholder="you@example.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               error={validationErrors.email}
@@ -118,38 +121,38 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSwitchToLogin }) => {
               onChange={(e) => setPassword(e.target.value)}
               error={validationErrors.password}
               disabled={isLoading}
-              rightIcon={showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+              rightIcon={showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
               onRightIconClick={() => setShowPassword(!showPassword)}
             />
 
             <Input
               label="Confirm Password"
               type={showConfirmPassword ? "text" : "password"}
-              placeholder="Confirm Password"
+              placeholder="Confirm password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               error={validationErrors.confirmPassword}
               disabled={isLoading}
-              rightIcon={showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+              rightIcon={showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
               onRightIconClick={() => setShowConfirmPassword(!showConfirmPassword)}
             />
 
             {/* Terms Checkbox */}
-            <div className="flex items-center gap-3 ml-1">
+            <div className="flex items-center gap-2.5">
               <input
                 type="checkbox"
                 id="terms"
                 checked={agreeTerms}
                 onChange={(e) => setAgreeTerms(e.target.checked)}
-                className="w-5 h-5 rounded-md border-gray-300 text-indigo-600 focus:ring-indigo-500 transition-all cursor-pointer"
+                className="size-4 rounded border-input text-primary focus:ring-ring/30 cursor-pointer"
                 disabled={isLoading}
               />
-              <label htmlFor="terms" className="text-sm font-semibold text-gray-600 cursor-pointer select-none">
-                Agree with <span className="text-indigo-600 hover:underline">Terms & Conditions</span>
+              <label htmlFor="terms" className="text-sm text-muted-foreground cursor-pointer select-none">
+                Agree with <span className="text-primary">Terms &amp; Conditions</span>
               </label>
             </div>
             {validationErrors.agreeTerms && (
-              <p className="ml-1 text-sm text-red-500 font-medium animate-slide-in-left">
+              <p className="text-sm text-destructive">
                 {validationErrors.agreeTerms}
               </p>
             )}
@@ -157,7 +160,7 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSwitchToLogin }) => {
             <Button
               type="submit"
               variant="primary"
-              className="w-full mt-4"
+              className="w-full"
               size="lg"
               disabled={isLoading}
             >
@@ -166,13 +169,13 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSwitchToLogin }) => {
           </form>
 
           {/* Switch to Login */}
-          <div className="mt-8 text-center">
-            <p className="text-gray-600 font-medium">
-              Already have Account?{' '}
+          <div className="mt-6 text-center">
+            <p className="text-sm text-muted-foreground">
+              Already have an account?{' '}
               <button
                 type="button"
                 onClick={onSwitchToLogin}
-                className="text-indigo-600 font-bold hover:text-indigo-700 hover:underline transition-all"
+                className="font-medium text-primary hover:underline"
                 disabled={isLoading}
               >
                 Sign In

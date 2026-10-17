@@ -52,28 +52,31 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToSignup }) => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-400 to-indigo-600 px-4">
-      <div className="w-full max-w-md animate-scale-in">
-        <div className="bg-white rounded-3xl shadow-2xl p-8 lg:p-10">
+    <div className="min-h-screen flex items-center justify-center bg-background px-4">
+      <div className="w-full max-w-md">
+        <div className="bg-card border border-border rounded-xl shadow-sm p-8">
           {/* Header */}
-          <div className="text-center mb-10">
-            <h2 className="text-3xl font-bold text-gray-900 mb-2">Welcome Back</h2>
-            <p className="text-gray-500 font-medium">Sign in to continue tracking your habits</p>
+          <div className="text-center mb-8">
+            <span className="mx-auto mb-4 flex size-10 items-center justify-center rounded-lg bg-primary text-primary-foreground text-base font-semibold">
+              H
+            </span>
+            <h2 className="text-2xl font-semibold text-foreground mb-1">Welcome back</h2>
+            <p className="text-sm text-muted-foreground">Sign in to continue tracking your habits</p>
           </div>
 
           {/* Error Message */}
           {error && (
-            <div className="mb-6 p-4 bg-red-50 border border-red-100 rounded-2xl animate-pulse">
-              <p className="text-red-600 text-sm font-bold text-center">{error}</p>
+            <div className="mb-6 p-3 bg-destructive/10 border border-destructive/20 rounded-lg">
+              <p className="text-destructive text-sm text-center">{error}</p>
             </div>
           )}
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-5">
             <Input
               label="Email"
               type="email"
-              placeholder="example@gmail.com"
+              placeholder="you@example.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               error={validationErrors.email}
@@ -88,15 +91,9 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToSignup }) => {
               onChange={(e) => setPassword(e.target.value)}
               error={validationErrors.password}
               disabled={isLoading}
-              rightIcon={showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+              rightIcon={showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
               onRightIconClick={() => setShowPassword(!showPassword)}
             />
-
-            <div className="flex justify-end">
-              <button type="button" className="text-sm font-semibold text-indigo-600 hover:text-indigo-800 hover:underline">
-                Forgot Password?
-              </button>
-            </div>
 
             <Button
               type="submit"
@@ -110,13 +107,13 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToSignup }) => {
           </form>
 
           {/* Switch to Signup */}
-          <div className="mt-8 text-center">
-            <p className="text-gray-600 font-medium">
+          <div className="mt-6 text-center">
+            <p className="text-sm text-muted-foreground">
               Don't have an account?{' '}
               <button
                 type="button"
                 onClick={onSwitchToSignup}
-                className="text-indigo-600 font-bold hover:text-indigo-700 hover:underline transition-all"
+                className="font-medium text-primary hover:underline"
                 disabled={isLoading}
               >
                 Sign up
