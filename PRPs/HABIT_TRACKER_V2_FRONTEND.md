@@ -321,9 +321,9 @@ know about before confirming an edit.
   month**, not the full goal period (see §6, resolves API doc open item #1
   from the frontend side: request narrow ranges, let lazy-creation handle
   the rest on scroll/navigate).
-  - Cell states: `done` (filled, habit-colored... actually no per-habit
+  - Cell states: `DONE` (filled, habit-colored... actually no per-habit
     color anymore since `color` field is dropped — use a single accent,
-    e.g. `bg-primary`), `not_done` + past (muted red outline), `not_done` +
+    e.g. `bg-primary`), `NOT_DONE` + past (muted red outline), `NOT_DONE` +
     future/today (neutral), **not in `frequencyDays`** (disabled, no click
     handler, dimmed — per API doc open item #2, assume `PUT` 404s on
     off-schedule dates, so don't let the UI attempt it).
@@ -409,7 +409,7 @@ Manual QA pass:
 5. Visit a date outside `frequencyDays` in the calendar → cell is disabled,
    no click handler fires.
 6. Edit a habit's `frequencyDays` → confirm the warning copy shows, and
-   previously-visible `not_done` future cells disappear/regenerate correctly
+   previously-visible `NOT_DONE` future cells disappear/regenerate correctly
    on next fetch.
 7. Delete a Goal with habits/tasks → `AlertDialog` warning shown, cascade
    confirmed (goal disappears from list).

@@ -14,7 +14,7 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form'
-import { isThreshold } from '@/lib/enums'
+import { toGoalTypeInput } from '@/lib/enums'
 import type { CreateHabitDto, Habit } from '@/types/habit'
 
 const DAYS = [
@@ -85,10 +85,11 @@ function habitToDefaults(habit?: Habit): HabitFormValues {
     frequencyDays: habit?.frequencyDays.map(String) ?? [],
     defaultTaskValue: habit?.defaultTaskValue != null ? String(habit.defaultTaskValue) : '',
   }
-  if (habit && isThreshold(habit.goalType)) {
+  const goalType = habit ? toGoalTypeInput(habit.goalType) : 'sum'
+  if (habit && goalType === 'threshold_count') {
     return {
       ...base,
-      goalType: 'threshold_count',
+      goalType,
       dailyMinValue: habit.dailyMinValue != null ? String(habit.dailyMinValue) : '',
       targetDays: habit.targetDays != null ? String(habit.targetDays) : '',
     }

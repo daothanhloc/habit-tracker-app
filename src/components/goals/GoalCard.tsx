@@ -31,7 +31,7 @@ export function GoalCard({ goal }: GoalCardProps) {
                       <span>
                         {habit.progress.current} / {formatProgressTarget(habit.progress.target)}
                       </span>
-                      <span data-testid={`streak-${habit.id}`} title="Current streak">
+                      <span data-testid={`streak-${habit.id}`} title="Current streak" aria-label={`Current streak: ${habit.currentStreak}`}>
                         🔥 {habit.currentStreak}
                       </span>
                     </span>
